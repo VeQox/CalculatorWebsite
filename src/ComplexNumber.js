@@ -1,68 +1,78 @@
 export default class ComplexNumber {
+
     constructor(radius, theta, real, imaginary){
-        this.radius = radius;
-        this.theta = theta;
-        this.real = real;
-        this.imaginary = imaginary;
+        this.Radius = radius;
+        this.Theta = theta;
+        this.Real = real;
+        this.Imaginary = imaginary;
     }
     
+    static Empty(){
+        return new ComplexNumber(undefined, undefined, undefined, undefined);
+    }
+
     static Component(real, imaginary){
-        return new ComplexNumber(undefined, undefined, real, imaginary);
+        return new ComplexNumber(this.Radius(real, imaginary), this.Theta(real, imaginary), real, imaginary);
     }
 
     static Exponent(radius, theta){
         return new ComplexNumber(radius, theta, undefined, undefined);
     }
 
-    get Radius(){
-        if(this.radius != undefined){
-            return this.radius;
-        }
-        else{
-            return (Math.sqrt(this.real^2+this.imaginary^2)).toFixed(2);
-        }
+    static Radius(real, imaginary){
+        return (Math.sqrt(real*real+imaginary*imaginary)).toFixed(2);
     }
 
-    get Theta(){
-        if(this.theta != undefined){
-            return this.theta;
+    static Theta(real, imaginary){
+        let theta = 0;
+        if (real < 0 && imaginary > 0) {
+            theta = Math.PI;
         }
-        else{
-            return (Math.atan(this.imaginary/this.real)).toFixed(2);
+        if(real < 0 && imaginary < 0){
+            theta = Math.PI;
         }
+        if(real > 0 && imaginary < 0){
+            theta = 3*Math.PI/2;
+        }
+        
+        return theta += parseFloat((Math.atan(imaginary/real)).toFixed(2));;
     }
 
-    get Real(){
-        if(this.real != undefined){
-            return this.real;
-        }
-        else{
-            return (this.radius*Math.cos(this.theta)).toFixed(2);
-        }
+    static Real(radius, theta){
+        return (radius*Math.cos(theta)).toFixed(2);
     }
 
-    get Imaginary(){
-        if(this.imaginary != undefined){
-            return this.imaginary;
-        }
-        else{
-            return (radius*Math.sin(this.theta)).toFixed(2);
-        }
+    static Imaginary(radius, theta){
+        return (radius*Math.sin(theta)).toFixed(2);
     }
 
-    Add(other){
-        return ComplexNumber.Component(parseFloat(this.Real) + parseFloat(other.Real), parseFloa(this.Imaginary) + parseFloat(other.Imaginary));
+    static Add(a, b){
+        return ComplexNumber.Component(parseFloat(a.Real) + parseFloat(b.Real), parseFloat(a.Imaginary) + parseFloat(b.Imaginary));
     }
     
-    Subtract(){
-        return ComplexNumber.Component(parseFloat(this.Real) - parseFloat(other.Real), parseFloa(this.Imaginary) - parseFloat(other.Imaginary));
+    static Subtract(a,b){
+        return ComplexNumber.Component(parseFloat(a.Real) - parseFloat(b.Real), parseFloat(a.Imaginary) - parseFloat(b.Imaginary));
     }
 
-    Mulitply(){
-        return ComplexNumber.Exponent(parseFloat(this.Radius) * parseFloat(other.Radius), parseFloat(this.Imaginary) + parseFloat(other.Imaginary));
+    static ConvertToExponent(a){
+        a.Radius = this.Radius(a.Real, a.Imaginary);
+        a.Theta = this.Theta(a.Real, a.Imaginary);
     }
 
-    Divide(){
-        return ComplexNumber.Exponent(parseFloat(this.Radius) / parseFloat(other.Radius), parseFloat(this.Imaginary) - parseFloat(other.Imaginary));
+    static ConvertToComponent(a){
+        a.Real = this.Real(a.Radius, a.Theta);
+        a.Imaginary = this.Theta(a.Radius, a.Theta);
+    }
+
+    static Mulitply(a,b){
+        this.ConvertToExponent(a);
+        this.ConvertToExponent(b);
+        return ComplexNumber.Exponent(parseFloat(a.Radius) * parseFloat(b.Radius), parseFloat(a.Theta) + parseFloat(b.Theta));
+    }
+
+    static Divide(a,b){
+        this.ConvertToExponent(a);
+        this.ConvertToExponent(b);
+        return ComplexNumber.Exponent(parseFloat(a.Radius) / parseFloat(b.Radius), parseFloat(a.Theta) - parseFloat(b.Theta));
     }
 }
